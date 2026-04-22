@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>손전등</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; display: flex; justify-content: center;
+            align-items: center; background-color: black;
+            touch-action: none; cursor: ns-resize;
+        }
+        #info {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 8rem; font-weight: 900;
+            opacity: 0; transition: opacity 0.4s ease-in-out;
+            /* 테두리 대신 검은색 그림자 */
+            text-shadow: 5px 5px 15px rgba(0, 0, 0, 0.8);
+            pointer-events: none; user-select: none;
+        }
+    </style>
+</head>
+<body onmousedown="start(event)" onmousemove="move(event)" onmouseup="end()"
+      ontouchstart="start(event)" ontouchmove="move(event)" ontouchend="end()">
+
+    <div id="info">0%</div>
+
+    <script>
+        const info = document.getElementById('info');
+        let isDrawing = false;
+        let startY = 0;
+        let currentBrightness = 0; // 0 ~ 255
+        let timer;
+
+        function start(e) {
+            isDrawing = true;
+            startY = e.touches ? e.touches[0].clientY : e.clientY;
+        }
+
+        function move(e) {
+            if (!isDrawing) return;
+
+            const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+            // 위로 올린 거리만큼 밝기 증가 (민감도 조절 가능)
+            const diff = (startY - currentY) * 0.5; 
+            startY = currentY;
+
+            currentBrightness = Math.max(0, Math.min(255, currentBrightness + diff));
+            const percent = Math.round((currentBrightness / 255) * 100);
+
+            // 배경색 및 글자색 업데이트
+            document.body.style.backgroundColor = `rgb(${currentBrightness}, ${currentBrightness}, ${currentBrightness})`;
+            
+            const rev = 255 - currentBrightness;
+            const mix = (currentBrightness + rev) / 2;
+            info.style.color = `rgb(${mix}, ${mix}, ${mix})`;
+            info.innerText = `${percent}%`;
+
+            // UI 표시 및 자동 사라짐
+            info.style.opacity = "1";
+            clearTimeout(timer);
+            timer = setTimeout(() => { info.style.opacity = "0"; }, 800);
+        }
+
+        function end() { isDrawing = false; }
+
+        document.body.addEventListener('click', () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        });
+    </script>
+</body>
+</html>
