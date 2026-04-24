@@ -42,7 +42,7 @@
 
             const currentY = e.touches ? e.touches[0].clientY : e.clientY;
             // 위로 올린 거리만큼 밝기 증가 (민감도 조절 가능)
-            const diff = (startY - currentY) * 0.5; 
+            const diff = (startY - currentY) * 1; 
             startY = currentY;
 
             currentBrightness = Math.max(0, Math.min(255, currentBrightness + diff));
